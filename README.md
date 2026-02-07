@@ -16,4 +16,4 @@ This app lets you create, edit, and manage your daily tasks. You can add descrip
 
 **For the full project breakdown, setup guide, and everything I learned:**
 
-https://docs.google.com/document/d/1WHzZhmzeomQqAwuFsqvTXfl6icsTd_igpkze7MwW7TU/edit?usp=sharing)
+https://docs.google.com/document/d/1WHzZhmzeomQqAwuFsqvTXfl6icsTd_igpkze7MwW7TU/edit?usp=sharing
