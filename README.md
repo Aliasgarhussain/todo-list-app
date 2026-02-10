@@ -1,7 +1,7 @@
 # To-Do List App
 
 A full-stack task management application I built using Node.js, Express, MongoDB, and React.
-netlify : https://todolistreactify.netlify.app
+netlify : https://todolisterers.netlify.app
 render : https://to-do-list-backend-47f2.onrender.com
 
 ## What It Does
