@@ -8,7 +8,23 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors());
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:5173',
+  process.env.FRONTEND_URL
+];
+
+app.use(cors({
+  origin: function(origin, callback) {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(null, true);
+    }
+  },
+  credentials: true
+}));
+
 app.use(express.json());
 
 mongoose.connect(process.env.MONGODB_URI)
@@ -19,7 +35,6 @@ app.get('/', (req, res) => {
   res.json({ message: 'To-Do API Running' });
 });
 
-// Get all tasks
 app.get('/api/tasks', async (req, res) => {
   try {
     const { status, priority, search, sortBy = 'createdAt', order = 'desc' } = req.query;
@@ -43,7 +58,21 @@ app.get('/api/tasks', async (req, res) => {
   }
 });
 
-// Get task by ID
+app.get('/api/tasks/search', async (req, res) => {
+  try {
+    const { q } = req.query;
+    const tasks = await Task.find({
+      $or: [
+        { title: { $regex: q, $options: 'i' } },
+        { description: { $regex: q, $options: 'i' } }
+      ]
+    });
+    res.json({ success: true, count: tasks.length, data: tasks });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
 app.get('/api/tasks/:id', async (req, res) => {
   try {
     const task = await Task.findById(req.params.id);
@@ -56,7 +85,6 @@ app.get('/api/tasks/:id', async (req, res) => {
   }
 });
 
-// Create task
 app.post('/api/tasks', async (req, res) => {
   try {
     const task = await Task.create(req.body);
@@ -66,7 +94,6 @@ app.post('/api/tasks', async (req, res) => {
   }
 });
 
-// Update task
 app.put('/api/tasks/:id', async (req, res) => {
   try {
     const task = await Task.findByIdAndUpdate(req.params.id, req.body, { 
@@ -82,7 +109,6 @@ app.put('/api/tasks/:id', async (req, res) => {
   }
 });
 
-// Update task status
 app.patch('/api/tasks/:id/status', async (req, res) => {
   try {
     const { status } = req.body;
@@ -100,7 +126,6 @@ app.patch('/api/tasks/:id/status', async (req, res) => {
   }
 });
 
-// Delete task
 app.delete('/api/tasks/:id', async (req, res) => {
   try {
     const task = await Task.findByIdAndDelete(req.params.id);
@@ -108,22 +133,6 @@ app.delete('/api/tasks/:id', async (req, res) => {
       return res.status(404).json({ success: false, message: 'Task not found' });
     }
     res.json({ success: true, message: 'Task deleted' });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-});
-
-// Search tasks
-app.get('/api/tasks/search', async (req, res) => {
-  try {
-    const { q } = req.query;
-    const tasks = await Task.find({
-      $or: [
-        { title: { $regex: q, $options: 'i' } },
-        { description: { $regex: q, $options: 'i' } }
-      ]
-    });
-    res.json({ success: true, count: tasks.length, data: tasks });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
